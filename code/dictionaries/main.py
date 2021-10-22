@@ -157,9 +157,6 @@ def check_passport(passport: dict, dest_country: str, allowed_to_travel_to: dict
     # 2. Countries that a person is not allowed to have been to, as forbidden by the destination country.
     # key = to_country
     # values are in forbidden_countries dictionary
-    print(dest_country)
-    print(allowed_to_travel_to)
-    print(forbidden_countries)
     if dest_country in forbidden_countries:
         forbidden_list = forbidden_countries[dest_country]
     else:
