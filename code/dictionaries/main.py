@@ -135,9 +135,6 @@ def add_stamp(passport: dict, country: str) -> dict:
         return passport
     else:
         stamp_list.append(country)
-        # passport["stamps"].clear
-        # = stamp_list
-        # = stamp_list
     return passport
 
 
