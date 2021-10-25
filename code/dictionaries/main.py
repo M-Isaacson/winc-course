@@ -1,5 +1,3 @@
-from typing import List
-from typing_extensions import Concatenate
 from helpers import get_countries
 
 __winc_id__ = "25a8041d2d5e4e3ab61ab1be43bfb863"
@@ -125,65 +123,40 @@ def add_stamp(passport: dict, country: str) -> dict:
     """
     Adds a stamp in a passport.
     """
-    stamp_list = []
-    nationality = passport["nationality"]
     # If key 'stamps' doesn't exists then create one
     if passport.get("stamps") == None:
         passport["stamps"] = []
-    stamp_list = passport["stamps"]
-    if nationality == country or country in stamp_list:
+    if passport["nationality"] == country or country in passport["stamps"]:
         return passport
     else:
-        stamp_list.append(country)
+        passport["stamps"].append(country)
+
+        return passport
     return passport
 
 
-def check_passport(passport: dict, dest_country: str, allowed_to_travel_to: dict, forbidden_countries: dict) -> bool:
+def check_passport(
+    the_passport: dict, dest_country: str, allowed_to_travel_to: dict, forbidden_countries: dict
+) -> bool:
     """
-    Checks if country to enter is allowed. If so create a stamp.
+    Checks if  country to enter is allowed. If so create a stamp.
     """
-    # 1. Citizens that are from this country are allowed to travel to by that country
-    # key = nationality
-    # values are in allowed_to_travel_to dictionary
-    nationality = passport["nationality"]
-    allowed_list = allowed_to_travel_to[nationality]
-    if dest_country in allowed_list:
-        first_check = False
-    else:
-        first_check = True
-    # 2. Countries that a person is not allowed to have been to, as forbidden by the destination country.
-    # key = to_country
-    # values are in forbidden_countries dictionary
-    if dest_country in forbidden_countries:
-        forbidden_list = forbidden_countries[dest_country]
-    else:
+    stamped_list = the_passport["stamps"]
+    stamped_list.append(the_passport["nationality"])
+
+    if dest_country not in allowed_to_travel_to[the_passport["nationality"]]:
         return False
-    # Creating a list of countries visited including the own nationality
-    if "stamps" not in passport:
-        stamped_list = [nationality]
-    else:
-        stamped_list = passport["stamps"]
-        stamped_list.append(nationality)
-    # Check if one has visited fronidden countries or is from a forbidden country
-    for i in range(len(stamped_list)):
-        if stamped_list[i] in forbidden_list:
-            second_check = False
-        second_check = True
-    # Get stamp when entry is allowed
-    if first_check and second_check:
-        add_stamp(passport, dest_country)
-        return True
-    else:
-        return False
+    elif forbidden_countries.get(dest_country) != None:
+        for stamp in stamped_list:
+            if stamp in forbidden_countries[dest_country]:
+                return False
+
+    return add_stamp(the_passport, dest_country)
 
 
 # This block is only executed if this script is run directly (python main.py).
 # It is not run if you import this file as a module.
 # if __name__ == "__main__":
-#     passport = create_passport("Henk Jansen", "2021-03-03", "New York", 1.85, "Germany")
-#     allowed_to = {"Belgium": ["The Netherlands", "Bulgaria"]}
+#     passport = create_passport("Henk Jansen", "2021-03-03", "New York", 1.85, "Belgium")
+#     allowed_to = {"Belgium": ["Netherlands", "Bulgaria"]}
 #     forbidden = {"The Netherlands": ["Afghanistan"]}
-
-#     print(passport)
-#     print(check_passport(passport, "The Netherlands", allowed_to, forbidden))
-#     print(check_passport(passport, "Bulgaria", allowed_to, forbidden))
