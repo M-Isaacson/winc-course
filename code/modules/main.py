@@ -66,6 +66,3 @@ def supergreeting_wrapper(name: str) -> str:
         The super awesome greeting thru a module.
     """
     return greet.supergreeting(name)
-
-
-print(supergreeting_wrapper("Jantje"))
