@@ -6,39 +6,39 @@ __winc_id__ = "ae539110d03e49ea8738fd413ac44ba8"
 __human_name__ = "files"
 
 
-def main() -> None:
-
+def main():
     clean_cache()
     cache_zip("code/files/data.zip", "code/files/cache")
     files = cached_files()
+    print(files)
     print(find_password(files))
 
 
-def clean_cache() -> None:
+def clean_cache():
     """
     Creates an empty folder called cache or
     when it exists will delete its contents.
     """
     # Setting the path to work with.
-
-    base_path = f"{os.getcwd()}/code/files/cache"
+    cache_path = f"{os.path.dirname(__file__)}/cache"
     # Make sure the base_path does really exists and is a directory.
-    if os.path.exists(base_path) and os.path.isdir(base_path):
+    if os.path.exists(cache_path) and os.path.isdir(cache_path):
         # Clear the directory 'cache'.
-        with os.scandir(base_path) as path_content:
+        with os.scandir(cache_path) as path_content:
             for item in path_content:
                 if item.is_file:
                     os.remove(item)
                 else:
                     # rmtree is used to avoid error if dir or subdir is not empty.
-                    rmtree(item)
+                    user_cmd = input(f"{item} already exists, remove?:")
+                    if user_cmd == "y":
+                        rmtree(item)
     else:
         # Create the directory 'cache'.
-        print(base_path)
-        os.mkdir(base_path)
+        os.makedirs(cache_path)
 
 
-def cache_zip(zip_path: str, cache_path: str) -> None or str:
+def cache_zip(zip_path: str, cache_path: str):
     """
     Unzip a zip file in the 'cache' folder
 
@@ -56,7 +56,7 @@ def cache_zip(zip_path: str, cache_path: str) -> None or str:
         with ZipFile(zip_path, "r") as zip_file:
             zip_file.extractall(cache_path)
     else:
-        return f"'{zip_path}' is not a valid zip file!"
+        return None
 
 
 def cached_files() -> list:
@@ -65,9 +65,9 @@ def cached_files() -> list:
     """
     file_list = []
     # Setting the path to work with.
-    base_path = f"{os.getcwd()}/code/files/cache"
+    cache_path = f"{os.path.dirname(__file__)}/cache"
     # Iterating the 'cache' folder
-    with os.scandir(base_path) as path_content:
+    with os.scandir(cache_path) as path_content:
         for item in path_content:
             if item.is_file:
                 file_list.append(item.path)
@@ -88,20 +88,14 @@ def find_password(file_list: list) -> str:
     str
         The password or an error message.
     """
-    message = "No password found"
-    stop_search = False
     for file in file_list:
-        if stop_search == False:
-            with open(file, "r") as txt_file:
-                for line in txt_file:
-                    if "password" in line:
-                        raw_message = line.split(":")
-                        message = raw_message[1].strip()
-                        stop_search = True
-                        break
-        else:
-            break
-    return message
+        with open(file, "r") as txt_file:
+            for line in txt_file:
+                if "password" in line:
+                    raw_message = line.split(":")
+                    message = raw_message[1].strip()
+                    return message
+    return None
 
 
 # This block is only executed if this script is run directly (python main.py)
