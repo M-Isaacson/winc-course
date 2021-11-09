@@ -1,7 +1,0 @@
-.vscode/
-.git/
-.gitignore
-.pytest_cache/
-test_example.py
-__pycache__/
-requirements.txt
